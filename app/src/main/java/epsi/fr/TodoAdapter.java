@@ -12,7 +12,7 @@ import java.util.List;
 import epsi.fr.model.Todo;
 
 /**
- * Created by Etienne on 17/05/14.
+ * Created by Etienne and Maxime on 17/05/14.
  */
 public class TodoAdapter extends BaseAdapter {
     List<Todo> data;
