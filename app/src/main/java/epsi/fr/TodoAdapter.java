@@ -1,11 +1,13 @@
 package epsi.fr;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -38,14 +40,14 @@ public class TodoAdapter extends BaseAdapter {
         return pos;
     }
 
-    static class ViewHolder {
+    /*static class ViewHolder {
         CheckBox titleView;
 
     }
-
+*/
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        /*ViewHolder holder;
         if(convertView == null) {
             LayoutInflater vi = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = vi.inflate(R.layout.todo_item, parent, false);
@@ -59,6 +61,34 @@ public class TodoAdapter extends BaseAdapter {
 
         Todo todo = data.get(position);
         holder.titleView.setText(todo.title);
+        return convertView;*/
+
+        CheckBox chk = null;
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.todo_item,
+                    parent, false);
+            chk = (CheckBox) convertView.findViewById(R.id.check);
+            convertView.setTag(chk);
+
+            chk.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    CheckBox cb = (CheckBox) v;
+                    Todo changeTask = (Todo) cb.getTag();
+                    changeTask.checked = (cb.isChecked() == true ? 1 : 0);
+                }
+            });
+
+        } else {
+            chk = (CheckBox) convertView.getTag();
+        }
+        Todo current = data.get(position);
+        chk.setText(current.title);
+        chk.setChecked(current.checked == 1 ? true : false);
+        chk.setTag(current);
         return convertView;
     }
 }

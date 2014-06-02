@@ -18,7 +18,7 @@ public class StorageHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "FeedReader.db";
 
     private static final String SQL_UP_0 =
-            "CREATE TABLE Todo (todo_id INTEGER PRIMARY KEY, title TEXT)";
+            "CREATE TABLE Todo (todo_id INTEGER PRIMARY KEY, title TEXT, checked INTEGER)";
 
     private static final String SQL_DOWN_0 = "DROP TABLE IF EXISTS TODO";
 
@@ -26,11 +26,11 @@ public class StorageHelper extends SQLiteOpenHelper {
             "ALTER Table Todo ADD date TEXT";
 
     private static final String SQL_DOWN_1 = "BEGIN TRANSACTION;" +
-            "CREATE TEMPORARY TABLE todo_backup(todo_id,title);\n" +
-            "INSERT INTO todo_backup SELECT todo_id,title FROM todo;\n" +
+            "CREATE TEMPORARY TABLE todo_backup(todo_id,title,checked);\n" +
+            "INSERT INTO todo_backup SELECT todo_id,title,checked FROM todo;\n" +
             "DROP TABLE todo;\n" +
             SQL_UP_0 +
-            "INSERT INTO todo SELECT todo_id,title FROM todo_backup;\n" +
+            "INSERT INTO todo SELECT todo_id,title,checked FROM todo_backup;\n" +
             "DROP TABLE todo_backup;\n" +
             "COMMIT;";
 
@@ -38,11 +38,11 @@ public class StorageHelper extends SQLiteOpenHelper {
             "ALTER Table Todo ADD date_done TEXT";
 
     private static final String SQL_DOWN_2 = "BEGIN TRANSACTION;" +
-            "CREATE TEMPORARY TABLE todo_backup(todo_id,title,date);\n" +
-            "INSERT INTO todo_backup SELECT todo_id,title,date FROM todo;\n" +
+            "CREATE TEMPORARY TABLE todo_backup(todo_id,title,checked,date);\n" +
+            "INSERT INTO todo_backup SELECT todo_id,title,checked,date FROM todo;\n" +
             "DROP TABLE todo;\n" +
             SQL_UP_0 +
-            "INSERT INTO todo SELECT todo_id,title,date FROM todo_backup;\n" +
+            "INSERT INTO todo SELECT todo_id,title,checked,date FROM todo_backup;\n" +
             "DROP TABLE todo_backup;\n" +
             "COMMIT;";
 
@@ -81,6 +81,7 @@ public class StorageHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("title", title);
+        values.put("checked", 0);
         db.insert("Todo", null, values);
         db.close();
     }
@@ -89,7 +90,7 @@ public class StorageHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query("Todo",                  //table
-                new String[] { "todo_id", "title" }, // columns
+                new String[] { "todo_id", "title", "checked" }, // columns
                 "todo_id" + "=?",                               // WHERE clause
                 new String[] { String.valueOf(id) },            // WHERE arguments
                 null,                                           // GROUP BY
@@ -100,7 +101,8 @@ public class StorageHelper extends SQLiteOpenHelper {
             cursor.moveToFirst();
 
         Todo todo = new Todo(Integer.parseInt(cursor.getString(0)),
-                cursor.getString(1));
+                cursor.getString(1),
+                Integer.parseInt(cursor.getString(2)));
         return todo;
     }
 
@@ -115,7 +117,8 @@ public class StorageHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 Todo todo = new Todo(Integer.parseInt(cursor.getString(0)),
-                        cursor.getString(1));
+                        cursor.getString(1),
+                        Integer.parseInt(cursor.getString(2)));
 
                 todoList.add(todo);
             } while (cursor.moveToNext());
@@ -138,6 +141,7 @@ public class StorageHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put("title", todo.title);
+        values.put("checked", todo.checked);
 
         return db.update("Todo",
                 values,

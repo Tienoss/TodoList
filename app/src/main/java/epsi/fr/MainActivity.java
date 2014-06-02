@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.os.Build;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -47,7 +48,7 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
@@ -88,7 +89,7 @@ public class MainActivity extends ActionBarActivity {
             TextView txt = (TextView) rootView.findViewById(R.id.text);
             final EditText ed = (EditText) rootView.findViewById(R.id.editText);
             Button btn = (Button) rootView.findViewById(R.id.button);
-            ListView lst = (ListView) rootView.findViewById(R.id.listView);
+            ListView lst = (ListView) rootView.findViewById(R.id.list);
             final Activity act = this.getActivity();
 
 
@@ -110,12 +111,23 @@ public class MainActivity extends ActionBarActivity {
                 }
             });
 
+            lst.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Todo todo = (Todo) parent.getItemAtPosition(position);
+                    Log.v("todo", "got todo: " + todo.title + " - " + todo.checked);
+
+                    helper.updateTodo(todo);
+                    reloadData();
+                }
+            });
+
             lst.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                     Todo todo = (Todo) parent.getItemAtPosition(position);
-                    Log.v("todo", "got todo: " + todo.title);
-                    
+                    Log.v("todo", "got todo: " + todo.title + " - " + todo.checked);
+
                     helper.deleteTodo(todo);
                     reloadData();
                     return true;
